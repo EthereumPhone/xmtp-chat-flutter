@@ -1,0 +1,22 @@
+PODS:
+  - cryptography_flutter (0.1.0):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+
+DEPENDENCIES:
+  - cryptography_flutter (from `Flutter/ephemeral/.symlinks/plugins/cryptography_flutter/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+
+EXTERNAL SOURCES:
+  cryptography_flutter:
+    :path: Flutter/ephemeral/.symlinks/plugins/cryptography_flutter/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+
+SPEC CHECKSUMS:
+  cryptography_flutter: d9ae6f7e4c477449ee409c08f9ce45760ab179be
+  FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
+
+PODFILE CHECKSUM: a884f6dd3f7494f3892ee6c81feea3a3abbf9153
+
+COCOAPODS: 1.11.3
