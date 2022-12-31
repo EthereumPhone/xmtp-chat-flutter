@@ -7,6 +7,8 @@ import 'package:xmtp/xmtp.dart';
 import 'package:xmtp_chat/components/message_item.dart';
 import 'package:xmtp_chat/data/local/messages_store.dart';
 import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/di/injection.dart';
+import 'package:xmtp_chat/domain/repository/xmtp_repository.dart';
 import 'package:xmtp_chat/utils/abbreviate.dart';
 
 import '../../components/address_avatar.dart';
@@ -28,11 +30,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
   StreamSubscription<DecodedMessage>? _subscription;
   bool isLoading = false;
 
+  final XmtpRepository _xmtpRepository = getIt();
+
   _loadMessages() async {
     setState(() {
       isLoading = true;
     });
-    var existingMessages = await client.listMessages(widget.conversation);
+    var existingMessages = await _xmtpRepository.getMessages(widget.conversation);
     store.setMessages(existingMessages);
     setState(() {
       isLoading = false;
@@ -40,7 +44,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   _listenForNewMessages() {
-    _subscription = client.streamMessages(widget.conversation).listen(
+    _subscription = _xmtpRepository.streamMessages(widget.conversation).listen(
       (newMessage) {
         store.addMessage(newMessage);
       },
@@ -48,7 +52,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   _sendMessage(String message) async {
-    await client.sendMessage(widget.conversation, message);
+    await _xmtpRepository.sendMessage(widget.conversation, message);
     _editingController.clear();
   }
 

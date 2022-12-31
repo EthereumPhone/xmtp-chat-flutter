@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:xmtp/xmtp.dart';
 import 'package:xmtp_chat/components/address_avatar.dart';
 import 'package:xmtp_chat/components/address_chip.dart';
-import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/di/injection.dart';
+import 'package:xmtp_chat/domain/repository/xmtp_repository.dart';
 import 'package:xmtp_chat/screens/messages/messages_screen.dart';
 
 class ConversationTile extends StatefulWidget {
@@ -21,21 +22,17 @@ class ConversationTile extends StatefulWidget {
 class _ConversationTileState extends State<ConversationTile> {
   DecodedMessage? _lastMessage;
 
+  final XmtpRepository _xmtpRepository = getIt();
+
   _getInitialLastMessage() async {
-    var messages = await client.listMessages(
-      widget.conversation,
-      limit: 1,
-      sort: SortDirection.SORT_DIRECTION_DESCENDING,
-    );
-    if (messages.isNotEmpty) {
-      setState(() {
-        _lastMessage = messages.first;
-      });
-    }
+    var lastMessage = await _xmtpRepository.getLastMessage(widget.conversation);
+    setState(() {
+      _lastMessage = lastMessage;
+    });
   }
 
   _listenLastMessage() {
-    client.streamMessages(widget.conversation).listen((message) {
+    _xmtpRepository.streamMessages(widget.conversation).listen((message) {
       setState(() {
         _lastMessage = message;
       });

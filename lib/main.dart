@@ -1,20 +1,24 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:web3dart/credentials.dart';
-import 'package:xmtp_chat/data/xmtp/account_store.dart';
 import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/domain/repository/account_repository.dart';
 import 'package:xmtp_chat/screens/home/home_screen.dart';
 import 'package:xmtp_chat/screens/login/login_screen.dart';
+
+import 'di/injection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  var privateKey = await getPrivateKey();
+  configureDependencies();
+
+  var session = getIt<Session>();
+  var accountRepository = getIt<AccountRepository>();
+
+  var privateKey = await accountRepository.getPrivateKey();
   if (privateKey != null) {
-    log("privateKey: $privateKey");
     var wallet = EthPrivateKey.fromHex(privateKey);
-    await initSession(wallet);
+    await session.initSession(wallet);
   }
 
   runApp(MyApp(privateKey: privateKey));

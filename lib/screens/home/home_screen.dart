@@ -3,7 +3,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:xmtp_chat/components/conversation_tile.dart';
 import 'package:xmtp_chat/components/my_profile_card.dart';
 import 'package:xmtp_chat/data/local/messages_store.dart';
-import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/di/injection.dart';
+import 'package:xmtp_chat/domain/repository/xmtp_repository.dart';
 import 'package:xmtp_chat/screens/messages/messages_screen.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -17,9 +18,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _editingController = TextEditingController();
+  final XmtpRepository _repository = getIt();
 
   _createNewConversation() async {
-    var conversation = await client.newConversation(_editingController.text);
+    var conversation = await _repository.createConversation(
+      _editingController.text,
+    );
     if (mounted) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return MessagesScreen(conversation: conversation);
@@ -45,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: MyProfileCard(address: client.address),
+                      child: MyProfileCard(address: _repository.getMyAddress()),
                     ),
                   ],
                 ),
@@ -71,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: MyProfileCard(address: client.address),
+                      child: MyProfileCard(address: _repository.getMyAddress()),
                     ),
                     ConversationTile(conversation: conversation)
                   ],

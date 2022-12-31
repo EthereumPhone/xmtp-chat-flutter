@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:xmtp_chat/components/address_avatar.dart';
-import 'package:xmtp_chat/data/xmtp/account_store.dart';
-import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/di/injection.dart';
+import 'package:xmtp_chat/domain/repository/account_repository.dart';
+import 'package:xmtp_chat/domain/repository/xmtp_repository.dart';
 import 'package:xmtp_chat/screens/login/login_screen.dart';
 import 'package:xmtp_chat/utils/abbreviate.dart';
 
@@ -17,6 +18,9 @@ class MyProfileCard extends StatefulWidget {
 }
 
 class _MyProfileCardState extends State<MyProfileCard> {
+  final AccountRepository _accountRepository = getIt();
+  final XmtpRepository _xmtpRepository = getIt();
+
   _disconnectWallet() {
     Navigator.pop(context);
 
@@ -29,7 +33,7 @@ class _MyProfileCardState extends State<MyProfileCard> {
           actions: [
             TextButton(
               onPressed: () async {
-                await storage.deleteAll();
+                await _accountRepository.deletePrivateKey();
                 if (mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
@@ -140,7 +144,9 @@ class _MyProfileCardState extends State<MyProfileCard> {
                                   onTap: () async {
                                     Navigator.pop(context);
                                     await Clipboard.setData(ClipboardData(
-                                      text: client.address.hexEip55,
+                                      text: _xmtpRepository
+                                          .getMyAddress()
+                                          .hexEip55,
                                     ));
                                   },
                                 ),

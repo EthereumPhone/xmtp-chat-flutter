@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/crypto.dart';
-import 'package:xmtp_chat/data/xmtp/account_store.dart';
+import 'package:xmtp_chat/data/xmtp/session.dart';
+import 'package:xmtp_chat/di/injection.dart';
+import 'package:xmtp_chat/domain/repository/account_repository.dart';
 import 'package:xmtp_chat/screens/home/home_screen.dart';
-
-import '../../data/xmtp/session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,6 +17,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _editingController = TextEditingController();
+
+  final AccountRepository _accountRepository = getIt();
+  final Session _session = getIt();
 
   _loginWithWallet() {
     showDialog(
@@ -48,8 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     var wallet = EthPrivateKey.createRandom(Random.secure());
-    await setPrivateKey(bytesToHex(wallet.privateKey, include0x: true));
-    await initSession(wallet);
+    await _accountRepository.savePrivateKey(
+      bytesToHex(wallet.privateKey, include0x: true),
+    );
+    await _session.initSession(wallet);
 
     if (mounted) {
       Navigator.pop(context);
@@ -82,9 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    await setPrivateKey(privateKey);
+    await _accountRepository.savePrivateKey(privateKey);
     var wallet = EthPrivateKey.fromHex(privateKey);
-    await initSession(wallet);
+    await _session.initSession(wallet);
 
     if (mounted) {
       Navigator.pop(context);

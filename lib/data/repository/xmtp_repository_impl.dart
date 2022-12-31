@@ -1,35 +1,82 @@
+import 'package:web3dart/credentials.dart';
 import 'package:xmtp/xmtp.dart';
+import 'package:xmtp_chat/data/xmtp/session.dart';
 import 'package:xmtp_chat/domain/repository/xmtp_repository.dart';
 
 class XmtpRepositoryImpl implements XmtpRepository {
-  final Client client;
+  late final Session _session;
 
-  XmtpRepositoryImpl({required this.client});
-
-  @override
-  Stream<Conversation> getConversations() {
-    return client.streamConversations();
+  XmtpRepositoryImpl(Session session) {
+    _session = session;
   }
 
   @override
-  Stream<DecodedMessage> getMessages(Conversation conversation) {
-    return client.streamMessages(conversation);
+  Future<DecodedMessage> sendMessage(
+      Conversation conversation, String content) {
+    return _session.client.sendMessage(conversation, content);
   }
 
   @override
-  Future<Stream<DecodedMessage>> getMessagesWithAddress(String address) async {
-    var conversation = await client.newConversation(address);
-    return client.streamMessages(conversation);
+  Future<DecodedMessage> sendMessageToAddress(
+      String address, String content) async {
+    var conversation = await _session.client.newConversation(address);
+    return _session.client.sendMessage(conversation, content);
   }
 
   @override
-  Future<DecodedMessage> sendMessage(Conversation conversation, String content) {
-    return client.sendMessage(conversation, content);
+  Future<List<Conversation>> getConversations() {
+    return _session.client.listConversations();
   }
 
   @override
-  Future<DecodedMessage> sendMessageToAddress(String address, String content) async {
-    var conversation = await client.newConversation(address);
-    return client.sendMessage(conversation, content);
+  Future<List<DecodedMessage>> getMessages(Conversation conversation) {
+    return _session.client.listMessages(conversation);
+  }
+
+  @override
+  Future<List<DecodedMessage>> getMessagesWithAddress(String address) async {
+    var conversation = await _session.client.newConversation(address);
+    return _session.client.listMessages(conversation);
+  }
+
+  @override
+  Stream<Conversation> streamConversations() {
+    return _session.client.streamConversations();
+  }
+
+  @override
+  Stream<DecodedMessage> streamMessages(Conversation conversation) {
+    return _session.client.streamMessages(conversation);
+  }
+
+  @override
+  Future<Stream<DecodedMessage>> streamMessagesWithAddress(
+      String address) async {
+    var conversation = await _session.client.newConversation(address);
+    return _session.client.streamMessages(conversation);
+  }
+
+  @override
+  Future<Conversation> createConversation(String address) {
+    return _session.client.newConversation(address);
+  }
+
+  @override
+  EthereumAddress getMyAddress() {
+    return _session.client.address;
+  }
+
+  @override
+  Future<DecodedMessage?> getLastMessage(Conversation conversation) async {
+    var messages = await _session.client.listMessages(
+      conversation,
+      limit: 1,
+      sort: SortDirection.SORT_DIRECTION_DESCENDING,
+    );
+    if (messages.isNotEmpty) {
+      return messages.first;
+    }
+
+    return null;
   }
 }

@@ -5,19 +5,27 @@ import 'package:xmtp/xmtp.dart' as xmtp;
 
 import '../local/messages_store.dart';
 
-late xmtp.Client client;
+class Session {
+  late final xmtp.Client _client;
 
-Future<xmtp.Client> initSession(Credentials wallet) async {
-  var api = xmtp.Api.create(host: "dev.xmtp.network", isSecure: true);
-  client = await xmtp.Client.createFromWallet(api, wallet);
-  log("Client: ${client.address.hexEip55}");
+  xmtp.Client get client => _client;
 
-  var existingConversations = await client.listConversations();
-  store.setConversations(existingConversations);
+  Future<xmtp.Client> initSession(Credentials wallet) async {
+    var api = xmtp.Api.create(host: "dev.xmtp.network", isSecure: true);
+    _client = await xmtp.Client.createFromWallet(api, wallet);
+    log("Client: ${_client.address.hexEip55}");
 
-  client.streamConversations().listen((newConversation) {
-    store.addConversation(newConversation);
-  });
+    _listenForNewConversations();
 
-  return client;
+    return _client;
+  }
+
+  _listenForNewConversations() async {
+    var existingConversations = await client.listConversations();
+    store.setConversations(existingConversations);
+
+    _client.streamConversations().listen((newConversation) {
+      store.addConversation(newConversation);
+    });
+  }
 }
