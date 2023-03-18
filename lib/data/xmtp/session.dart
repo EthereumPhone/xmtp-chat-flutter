@@ -6,7 +6,7 @@ import 'package:xmtp/xmtp.dart' as xmtp;
 import '../local/messages_store.dart';
 
 class Session {
-  late final xmtp.Client _client;
+  late xmtp.Client _client;
 
   xmtp.Client get client => _client;
 
