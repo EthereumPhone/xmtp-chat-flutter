@@ -34,6 +34,7 @@ class _MyProfileCardState extends State<MyProfileCard> {
             TextButton(
               onPressed: () async {
                 await _accountRepository.deletePrivateKey();
+                await _accountRepository.deleteKeys();
                 if (mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,

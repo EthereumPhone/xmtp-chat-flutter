@@ -9,6 +9,7 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   static const storageKey = "private_key";
+  static const keysKey = "keys";
 
   @override
   Future<String?> getPrivateKey() async {
@@ -23,5 +24,20 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<void> deletePrivateKey() async {
     await _secureStorage.delete(key: storageKey);
+  }
+
+  @override
+  Future<String?> getKeys() async {
+    return await _secureStorage.read(key: keysKey);
+  }
+
+  @override
+  Future<void> saveKeys(String keys) async {
+    await _secureStorage.write(key: keysKey, value: keys);
+  }
+
+  @override
+  Future<void> deleteKeys() async {
+    await _secureStorage.delete(key: keysKey);
   }
 }

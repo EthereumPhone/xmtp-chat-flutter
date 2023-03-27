@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:xmtp_chat/components/wallets_sheet.dart';
 import 'package:xmtp_chat/data/xmtp/session.dart';
 import 'package:xmtp_chat/di/injection.dart';
 import 'package:xmtp_chat/domain/repository/account_repository.dart';
@@ -21,24 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final AccountRepository _accountRepository = getIt();
   final Session _session = getIt();
 
-  _loginWithWallet() {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text("Coming soon"),
-          content: const Text("This feature is coming soon."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Ok"),
-            ),
-          ],
-        );
-      },
-    );
+  _loginWithWallet() async {
+    WalletsSheet.show(context);
   }
 
   _loginAsGuest() async {

@@ -7,27 +7,34 @@ import 'package:xmtp_chat/screens/login/login_screen.dart';
 
 import 'di/injection.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   configureDependencies();
 
-  var session = getIt<Session>();
   var accountRepository = getIt<AccountRepository>();
+  var session = getIt<Session>();
 
   var privateKey = await accountRepository.getPrivateKey();
+  var keys = await accountRepository.getKeys();
   if (privateKey != null) {
     var wallet = EthPrivateKey.fromHex(privateKey);
     await session.initSession(wallet);
+  } else if (keys != null) {
+    await session.initSessionWithKeys();
   }
 
-  runApp(MyApp(privateKey: privateKey));
+  runApp(MyApp(
+    isConnected: keys != null || privateKey != null,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, this.privateKey});
+  const MyApp({super.key, this.isConnected = false});
 
-  final String? privateKey;
+  final bool isConnected;
 
   // This widget is the root of your application.
   @override
@@ -46,7 +53,8 @@ class MyApp extends StatelessWidget {
         colorScheme: const ColorScheme.dark(),
         scaffoldBackgroundColor: const Color(0xFF232323),
       ),
-      home: privateKey == null ? const LoginScreen() : const HomeScreen(),
+      home: !isConnected ? const LoginScreen() : const HomeScreen(),
+      navigatorKey: navigatorKey,
     );
   }
 }

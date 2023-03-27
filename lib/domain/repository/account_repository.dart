@@ -4,4 +4,10 @@ abstract class AccountRepository {
   Future<String?> getPrivateKey();
 
   Future<void> deletePrivateKey();
+
+  Future<String?> getKeys();
+
+  Future<void> saveKeys(String keys);
+
+  Future<void> deleteKeys();
 }

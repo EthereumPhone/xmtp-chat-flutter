@@ -44,7 +44,8 @@ dependencies:
   mobx_codegen: ^2.1.1
   walletconnect_dart: ^0.0.11
   url_launcher: ^6.1.7
-  flutter_secure_storage: ^7.0.1
+  flutter_secure_storage: ^8.0.0
+  qr_flutter: ^4.0.0
 
   # Dependency injection
   get_it: ^7.2.0
